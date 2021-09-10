@@ -4,11 +4,14 @@
   "description": "A discord bot that communicates with the ScoreSaber and BeatSaver API",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "main": "node index.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Rangeclone/SaberBot.git"
+  },
+  "engines": {
+    "node": "12.x"
   },
   "author": "Modder0Source",
   "license": "ISC",
@@ -17,6 +20,9 @@
   },
   "homepage": "https://github.com/Rangeclone/SaberBot#readme",
   "dependencies": {
+    "@discordjs/builders": "^0.6.0",
+    "@discordjs/rest": "^0.1.0-canary.0",
+    "discord-api-types": "^0.23.1",
     "discord.js": "^13.1.0"
   },
   "devDependencies": {
