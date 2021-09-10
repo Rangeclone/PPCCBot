@@ -1,7 +1,7 @@
 {
   "name": "saberbot",
   "version": "1.0.0",
-  "description": "A discord bot that communicates with the ScoreSaber and BeatSaver API.",
+  "description": "A discord bot that communicates with the ScoreSaber and BeatSaver API",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
