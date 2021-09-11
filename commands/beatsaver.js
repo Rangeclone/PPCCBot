@@ -3,13 +3,22 @@ const { MessageActionRow, MessageSelectMenu, MessageEmbed } = require('discord.j
 const request = require('request');
 const songsperpage = 5;
 
-function embedmake(interaction, data, currentpage, pages) {
+async function embedmake(interaction, data, currentpage, pages) {
 	const returnembed = new MessageEmbed()
 		.setTitle('Songs from BeatSaver')
 		.setThumbnail('https://beatsaver.com/static/favicon/apple-touch-icon.png')
+		.setURL('https://beatsaver.com/')
 		.setTimestamp()
-		.setFooter('Page ' + String(currentpage) + '/' + String(pages));
+		.setDescription('Page ' + String(currentpage) + '/' + String(pages));
+	for (const pos in data) {
+		console.log(pos);
+	}
 	return returnembed;
+}
+
+function index(p, c) {
+	if (c == true) return p + 1;
+	if (c == false) return p - 1;
 }
 
 module.exports = {
@@ -65,13 +74,26 @@ module.exports = {
 					if (!response) return interaction.followUp({ content: 'There was an error contacting the BeatSaver API.', components: [] });
 					if (!response.body) return interaction.followUp({ content: 'There was an error contacting the BeatSaver API.', components: [] });
 					const data = JSON.parse(response.body);
-					console.log(data);
 					const songarray = data.docs;
 					const pages = Math.floor(songarray.length / songsperpage);
 					const currentpage = 1;
-					console.log(pages);
-					const SaverEmbed = await embedmake(interaction, data, currentpage, pages);
-					console.log(songarray[0]);
+					let currentarray = 0;
+					let currentdataindex = 0;
+					const dataarray = {};
+					for (const pos in songarray) {
+						if (currentarray > pages) break;
+						const selectedsong = songarray[pos];
+						if (!dataarray[currentarray]) {dataarray[currentarray] = [];}
+						const selectedarray = dataarray[currentarray];
+						selectedarray.push(selectedsong);
+						currentdataindex = currentdataindex + 1;
+						if (index(currentdataindex, true) > songsperpage) {
+							currentarray = currentarray + 1;
+							currentdataindex = 0;
+						}
+					}
+					console.log(dataarray);
+					const SaverEmbed = await embedmake(interaction, dataarray[index(currentpage, false)], currentpage, pages);
 					interaction.channel.send({ embeds: [SaverEmbed] });
 				});
 			}
