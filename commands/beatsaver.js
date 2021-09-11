@@ -18,6 +18,7 @@ async function embedmake(interaction, data, currentpage, pages) {
 		.setThumbnail('https://beatsaver.com/static/favicon/apple-touch-icon.png')
 		.setURL('https://beatsaver.com/')
 		.setTimestamp()
+		.setDescription('Having problems installing? [Click Here](https://oneclick-redirect.000webhostapp.com/first.html?id=1188e) to enable them.')
 		.setAuthor('Page ' + String(currentpage) + '/' + String(pages))
 		.setFooter('This prompt will expire in ' + Math.floor(buttonexpire / 1000) + ' seconds');
 	for (const pos in data) {
