@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageActionRow, MessageSelectMenu, MessageEmbed, MessageButton } = require('discord.js');
 const request = require('request');
 const songsperpage = 5;
-const buttonexpire = 20000;
+const buttonexpire = 300000;
 
 const difshort = {
 	Easy: 'E',
@@ -20,7 +20,7 @@ async function embedmake(interaction, data, currentpage, pages) {
 		.setTimestamp()
 		.setDescription('Having problems installing? [Click Here](https://oneclick-redirect.000webhostapp.com/first.html?id=1188e) to enable them.')
 		.setAuthor('Page ' + String(currentpage) + '/' + String(pages))
-		.setFooter('This prompt will expire in ' + Math.floor(buttonexpire / 1000) + ' seconds');
+		.setFooter('This prompt will deactivate in ' + Math.floor(buttonexpire / 1000) + ' seconds');
 	for (const pos in data) {
 		const songdata = data[pos];
 		const currentversion = songdata.versions[songdata.versions.length - 1];
