@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageActionRow, MessageSelectMenu, MessageEmbed } = require('discord.js');
+const { MessageActionRow, MessageSelectMenu, MessageEmbed, MessageButton } = require('discord.js');
 const request = require('request');
 const songsperpage = 5;
 
@@ -28,7 +28,14 @@ async function embedmake(interaction, data, currentpage, pages) {
 			const append = difshort[selecteddif.difficulty];
 			difstring = difstring + append + ' ';
 		}
-		returnembed.addField(`${songdata.name}`, `Mapper: [${songdata.uploader.name}](https://beatsaver.com/profile/${songdata.uploader.id}) \nDifficulties: ${difstring} \nDownloads: ${songdata.stats.downloads} \nRating: ${String(songdata.stats.score * 100)}% \n[Install](https://oneclick-redirect.glitch.me/?id=${songdata.id}) | [Download](${currentversion.downloadURL}) | [Site](https://beatsaver.com/maps/${songdata.id})`, false);
+		let songname = '';
+		if (songdata.automapper == false) {
+			songname = songdata.name;
+		}
+		else {
+			songname = songdata.name + '[AUTO GENERATED]';
+		}
+		returnembed.addField(`${songname}`, `Mapper: [${songdata.uploader.name}](https://beatsaver.com/profile/${songdata.uploader.id}) \nDifficulties: ${difstring} \nDownloads: ${songdata.stats.downloads} \nRating: ${String(songdata.stats.score * 100)}% \n[Install](https://oneclick-redirect.glitch.me/?id=${songdata.id}) | [Download](${currentversion.downloadURL}) | [Site](https://beatsaver.com/maps/${songdata.id})`, false);
 	}
 	return returnembed;
 }
@@ -93,7 +100,7 @@ module.exports = {
 					const data = JSON.parse(response.body);
 					const songarray = data.docs;
 					const pages = Math.floor(songarray.length / songsperpage);
-					const currentpage = 1;
+					let currentpage = 1;
 					let currentarray = 0;
 					let currentdataindex = 0;
 					const dataarray = {};
@@ -109,8 +116,47 @@ module.exports = {
 							currentdataindex = 0;
 						}
 					}
-					const SaverEmbed = await embedmake(interaction, dataarray[index(currentpage, false)], currentpage, pages);
-					interaction.channel.send({ embeds: [SaverEmbed] });
+					let SaverEmbed = await embedmake(interaction, dataarray[index(currentpage, false)], currentpage, pages);
+					const row2 = new MessageActionRow()
+						.addComponents(
+							new MessageButton()
+								.setCustomId('previous')
+								.setLabel('<')
+								.setStyle('PRIMARY'),
+						)
+						.addComponents(
+							new MessageButton()
+								.setCustomId('next')
+								.setLabel('>')
+								.setStyle('PRIMARY'),
+						);
+					const message = await interaction.channel.send({ embeds: [SaverEmbed], components: [row2] });
+					const filter2 = z => z.customId === 'primary' && z.user.id === interaction.user.id;
+
+					const collector2 = interaction.channel.createMessageComponentCollector({ filter2, time: 15000 });
+					let pagechanged = false;
+					let newpage;
+					collector2.on('collect', async z => {
+						if (z.customId === 'previous') {
+							pagechanged = true;
+							newpage = currentpage - 1;
+							if (newpage < 1) newpage = pages;
+						}
+						if (z.customId === 'next') {
+							pagechanged = true;
+							newpage = currentpage + 1;
+							if (newpage > pages) newpage = 1;
+						}
+						if (pagechanged == true) {
+							pagechanged = false;
+							currentpage = newpage;
+							SaverEmbed = await embedmake(interaction, dataarray[index(currentpage, false)], currentpage, pages);
+							console.log(message.id);
+							z.update({ embeds: [SaverEmbed], components: [row2] });
+						}
+					});
+
+					collector2.on('end', collected => console.log(`Collected ${collected.size} items`));
 				});
 			}
 		});
