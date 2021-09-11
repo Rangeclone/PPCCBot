@@ -3,15 +3,32 @@ const { MessageActionRow, MessageSelectMenu, MessageEmbed } = require('discord.j
 const request = require('request');
 const songsperpage = 5;
 
+const difshort = {
+	Easy: 'E',
+	Normal: 'N',
+	Hard: 'H',
+	Expert: 'EX',
+	ExpertPlus: 'EX+',
+};
+
 async function embedmake(interaction, data, currentpage, pages) {
 	const returnembed = new MessageEmbed()
 		.setTitle('Songs from BeatSaver')
 		.setThumbnail('https://beatsaver.com/static/favicon/apple-touch-icon.png')
 		.setURL('https://beatsaver.com/')
 		.setTimestamp()
-		.setDescription('Page ' + String(currentpage) + '/' + String(pages));
+		.setDescription('Having problems installing? [Click Here](https://oneclick-redirect.glitch.me/newuser?id=1188e) to enable them.')
+		.setFooter('Page ' + String(currentpage) + '/' + String(pages));
 	for (const pos in data) {
-		console.log(pos);
+		const songdata = data[pos];
+		const currentversion = songdata.versions[songdata.versions.length - 1];
+		let difstring = '';
+		for (const difpos in currentversion.diffs) {
+			const selecteddif = currentversion.diffs[difpos];
+			const append = difshort[selecteddif.difficulty];
+			difstring = difstring + append + ' ';
+		}
+		returnembed.addField(`${songdata.name}`, `Mapper: [${songdata.uploader.name}](https://beatsaver.com/profile/${songdata.uploader.id}) \nDifficulties: ${difstring} \nDownloads: ${songdata.stats.downloads} \nRating: ${String(songdata.stats.score * 100)}% \n[Install](https://oneclick-redirect.glitch.me/?id=${songdata.id}) | [Download](${currentversion.downloadURL}) | [Site](https://beatsaver.com/maps/${songdata.id})`, false);
 	}
 	return returnembed;
 }
@@ -92,7 +109,6 @@ module.exports = {
 							currentdataindex = 0;
 						}
 					}
-					console.log(dataarray);
 					const SaverEmbed = await embedmake(interaction, dataarray[index(currentpage, false)], currentpage, pages);
 					interaction.channel.send({ embeds: [SaverEmbed] });
 				});
