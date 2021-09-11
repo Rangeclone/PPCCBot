@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageActionRow, MessageSelectMenu, MessageEmbed, MessageButton } = require('discord.js');
 const request = require('request');
 const songsperpage = 5;
+const buttonexpire = 20000;
 
 const difshort = {
 	Easy: 'E',
@@ -17,8 +18,8 @@ async function embedmake(interaction, data, currentpage, pages) {
 		.setThumbnail('https://beatsaver.com/static/favicon/apple-touch-icon.png')
 		.setURL('https://beatsaver.com/')
 		.setTimestamp()
-		.setDescription('Having problems installing? [Click Here](https://oneclick-redirect.glitch.me/newuser?id=1188e) to enable them.')
-		.setFooter('Page ' + String(currentpage) + '/' + String(pages));
+		.setAuthor('Page ' + String(currentpage) + '/' + String(pages))
+		.setFooter('This prompt will expire in ' + Math.floor(buttonexpire / 1000) + ' seconds');
 	for (const pos in data) {
 		const songdata = data[pos];
 		const currentversion = songdata.versions[songdata.versions.length - 1];
@@ -35,7 +36,7 @@ async function embedmake(interaction, data, currentpage, pages) {
 		else {
 			songname = songdata.name + '[AUTO GENERATED]';
 		}
-		returnembed.addField(`${songname}`, `Mapper: [${songdata.uploader.name}](https://beatsaver.com/profile/${songdata.uploader.id}) \nDifficulties: ${difstring} \nDownloads: ${songdata.stats.downloads} \nRating: ${String(songdata.stats.score * 100)}% \n[Install](https://oneclick-redirect.glitch.me/?id=${songdata.id}) | [Download](${currentversion.downloadURL}) | [Site](https://beatsaver.com/maps/${songdata.id})`, false);
+		returnembed.addField(`${songname}`, `Mapper: [${songdata.uploader.name}](https://beatsaver.com/profile/${songdata.uploader.id}) \nDifficulties: ${difstring} \nDownloads: ${songdata.stats.downloads} \nRating: ${String(songdata.stats.score * 100)}% \n[Install](https://oneclick-redirect.000webhostapp.com/?id=${songdata.id}) | [Download](${currentversion.downloadURL}) | [Site](https://beatsaver.com/maps/${songdata.id})`, false);
 	}
 	return returnembed;
 }
@@ -130,10 +131,10 @@ module.exports = {
 								.setLabel('>')
 								.setStyle('PRIMARY'),
 						);
-					const message = await interaction.channel.send({ embeds: [SaverEmbed], components: [row2] });
+					await interaction.channel.send({ embeds: [SaverEmbed], components: [row2] });
 					const filter2 = z => z.customId === 'primary' && z.user.id === interaction.user.id;
 
-					const collector2 = interaction.channel.createMessageComponentCollector({ filter2, time: 15000 });
+					const collector2 = interaction.channel.createMessageComponentCollector({ filter2, time: buttonexpire });
 					let pagechanged = false;
 					let newpage;
 					collector2.on('collect', async z => {
@@ -151,7 +152,6 @@ module.exports = {
 							pagechanged = false;
 							currentpage = newpage;
 							SaverEmbed = await embedmake(interaction, dataarray[index(currentpage, false)], currentpage, pages);
-							console.log(message.id);
 							z.update({ embeds: [SaverEmbed], components: [row2] });
 						}
 					});
