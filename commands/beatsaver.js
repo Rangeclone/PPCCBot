@@ -1,10 +1,13 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageActionRow, MessageSelectMenu } = require('discord.js');
+const { MessageActionRow, MessageSelectMenu, MessageEmbed } = require('discord.js');
+const request = require('request');
+const songsperpage = 5;
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('beatsaver')
 		.setDescription('Displays a list of uploaded songs.'),
-	async execute(interaction) {
+	async execute(client, interaction) {
 		const row = new MessageActionRow()
 			.addComponents(
 				new MessageSelectMenu()
@@ -12,27 +15,58 @@ module.exports = {
 					.setPlaceholder('Nothing selected')
 					.addOptions([
 						{
-							label: 'Latest',
-							description: 'Latest songs',
-							value: 'first_option',
+							label: 'First Published',
+							description: 'First Published songs',
+							value: 'FIRST_PUBLISHED',
 						},
 						{
-							label: 'Rating',
-							description: 'Best rated songs',
-							value: 'second_option',
+							label: 'Updated',
+							description: 'Updated songs',
+							value: 'UPDATED',
+						},
+						{
+							label: 'Last Published',
+							description: 'Last Published songs',
+							value: 'LAST_PUBLISHED',
+						},
+						{
+							label: 'Created',
+							description: 'Created songs',
+							value: 'CREATED',
 						},
 					]),
 			);
 		await interaction.reply({ content: 'Please select what to sort by.', components: [row] });
+		let selected = false;
 		const filter = i => i.customId === 'select' && i.user.id === interaction.user.id;
 		const collector = interaction.channel.createMessageComponentCollector({ filter, time: 15000 });
 		collector.on('collect', async i => {
-			if (i.customId === 'select') {
-				await i.deferUpdate();
-				await i.editReply({ content: 'A menu was selected!', components: [] });
+			if (i.customId === 'select' && selected == false) {
+				selected = true;
+				await interaction.editReply({ content: 'Contacting the BeatSaver API....', components: [] });
+				const options = {
+					url: 'https://api.beatsaver.com/maps/latest?sort=' + String(i.values[0]) || 'UPDATED',
+					method: 'GET',
+					headers: {
+						'Accept': 'application/json',
+					},
+				};
+				request(options, async function(error, response) {
+					interaction.deleteReply();
+					if (!response) return interaction.followUp({ content: 'There was an error contacting the BeatSaver API.', components: [] });
+					if (!response.body) return interaction.followUp({ content: 'There was an error contacting the BeatSaver API.', components: [] });
+					const data = JSON.parse(response.body);
+					console.log(data);
+					console.log(data.docs.length);
+					const pages = Math.floor(data.docs.length / songsperpage);
+					const currentpage = 1;
+					console.log(pages);
+					const SaverEmbed = new MessageEmbed()
+						.setTitle('Some title');
+					interaction.channel.send({ embeds: [SaverEmbed] });
+				});
 			}
 		});
-
 		collector.on('end', collected => console.log(`Collected ${collected.size} items`));
 	},
 };
