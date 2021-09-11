@@ -3,6 +3,15 @@ const { MessageActionRow, MessageSelectMenu, MessageEmbed } = require('discord.j
 const request = require('request');
 const songsperpage = 5;
 
+function embedmake(interaction, data, currentpage, pages) {
+	const returnembed = new MessageEmbed()
+		.setTitle('Songs from BeatSaver')
+		.setThumbnail('https://beatsaver.com/static/favicon/apple-touch-icon.png')
+		.setTimestamp()
+		.setFooter('Page ' + String(currentpage) + '/' + String(pages));
+	return returnembed;
+}
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('beatsaver')
@@ -57,12 +66,12 @@ module.exports = {
 					if (!response.body) return interaction.followUp({ content: 'There was an error contacting the BeatSaver API.', components: [] });
 					const data = JSON.parse(response.body);
 					console.log(data);
-					console.log(data.docs.length);
-					const pages = Math.floor(data.docs.length / songsperpage);
+					const songarray = data.docs;
+					const pages = Math.floor(songarray.length / songsperpage);
 					const currentpage = 1;
 					console.log(pages);
-					const SaverEmbed = new MessageEmbed()
-						.setTitle('Some title');
+					const SaverEmbed = await embedmake(interaction, data, currentpage, pages);
+					console.log(songarray[0]);
 					interaction.channel.send({ embeds: [SaverEmbed] });
 				});
 			}
