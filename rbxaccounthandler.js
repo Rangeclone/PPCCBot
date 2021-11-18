@@ -1,7 +1,7 @@
 const noblox = require('noblox.js');
 const config = require('./config.json');
 module.exports = {
-	async execute(guildId) {
+	async changeaccount(guildId) {
 		if (config.groups && guildId) {
 			const selectedgroup = config.groups[String(guildId)];
 			if (!selectedgroup) return null;
