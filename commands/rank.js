@@ -7,9 +7,10 @@ module.exports = {
 		.setName('rank')
 		.setDescription('Changes the rank of a ROBLOX user.'),
 	async execute(client, interaction) {
-		changeaccount(interaction.guild.id).then((currentUser) => {
-			console.log(currentUser);
-			if (!currentUser) return interaction.followUp({ content: 'Error: This guild has not been assigned a group/token.', components: [] });
+		changeaccount(interaction.guild.id).then((response) => {
+			console.log(response);
+			if (response == null) return interaction.reply({ content: 'Error: This guild has not been assigned a group/token.', components: [] });
+			if (response.success == false) return interaction.reply({ content: `Failed to login to roblox account: \`\`\`${response.error}\`\`\``, components: [] });
 		});
 	},
 };
