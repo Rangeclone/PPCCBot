@@ -9,6 +9,7 @@ module.exports = {
 				return {
 					success: true,
 					user: res,
+					group: selectedgroup[0],
 				};
 			}).catch(function(e) {
 				return {
