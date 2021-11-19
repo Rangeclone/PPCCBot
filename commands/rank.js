@@ -4,6 +4,10 @@ const noblox = require('noblox.js');
 const { changeaccount } = require('../rbxaccounthandler.js');
 
 module.exports = {
+	permissions: {
+		roles: ['Bot Perms'],
+		users: [216703533460881409],
+	},
 	data: new SlashCommandBuilder()
 		.setName('rank')
 		.setDescription('Changes the rank of a ROBLOX user.')
