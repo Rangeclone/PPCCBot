@@ -47,13 +47,13 @@ module.exports = {
 					if (roleid == null) return interaction.reply({ content: 'Failed to find ROBLOX rank, did you enter the correct rank name?', components: [] });
 					noblox.setRank({ group: response.group, target: Number(req2.Id), rank: Number(roleid) }).then((nobloxres) => {
 						if (nobloxres) {
-							interaction.reply({ content: 'Successfully changed ' + username + '\'s rank to ' + rank, components: [] });
+							interaction.reply({ content: 'Successfully changed `' + username + '\'s` rank to `' + rank + '`', components: [] });
 						}
 						else {
 							throw 'Did not recieve expected response from API.';
 						}
 					}).catch(function(e) {
-						return interaction.reply({ content: `Failed to change ${username}'s rank to ${rank}: \`\`\`${e}\`\`\``, components: [] });
+						return interaction.reply({ content: `Failed to change \`${username}'s\` rank to \`${rank}\` \`\`\`${e}\`\`\``, components: [] });
 					});
 				});
 			});
