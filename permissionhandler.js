@@ -1,4 +1,3 @@
-const noblox = require('noblox.js');
 const { Permissions } = require('discord.js');
 module.exports = {
 	async checkperms(table, member, interaction) {
