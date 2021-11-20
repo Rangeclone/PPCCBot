@@ -17,8 +17,8 @@ module.exports = {
 	async execute(client, interaction) {
 
 		changeaccount(interaction.guild.id).then((response) => {
-			if (response == null) return interaction.reply({ content: 'Error: This guild has not been assigned a group/token.', components: [] });
-			if (response.success == false) return interaction.reply({ content: `Failed to login to roblox account: \`\`\`${response.error}\`\`\``, components: [] });
+			if (response == null) return interaction.reply({ content: 'Error: This guild has not been assigned a group/token.', components: [] }).then(setTimeout(() => interaction.deleteReply(), 10000));
+			if (response.success == false) return interaction.reply({ content: `Failed to login to roblox account: \`\`\`${response.error}\`\`\``, components: [] }).then(setTimeout(() => interaction.deleteReply(), 10000));
 			const shout = interaction.options.get('shout').value;
 			noblox.shout(response.group, shout).then((nobloxres) => {
 				if (nobloxres) {
@@ -28,7 +28,7 @@ module.exports = {
 					throw 'Did not recieve expected response from API.';
 				}
 			}).catch(function(e) {
-				return interaction.reply({ content: `Failed to change group shout to \`${shout}\` \`\`\`${e}\`\`\``, components: [] });
+				return interaction.reply({ content: `Failed to change group shout to \`${shout}\` \`\`\`${e}\`\`\``, components: [] }).then(setTimeout(() => interaction.deleteReply(), 10000));
 			});
 		});
 	},

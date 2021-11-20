@@ -29,8 +29,8 @@ module.exports = {
 	async execute(client, interaction) {
 
 		changeaccount(interaction.guild.id).then((response) => {
-			if (response == null) return interaction.reply({ content: 'Error: This guild has not been assigned a group/token.', components: [] });
-			if (response.success == false) return interaction.reply({ content: `Failed to login to roblox account: \`\`\`${response.error}\`\`\``, components: [] });
+			if (response == null) return interaction.reply({ content: 'Error: This guild has not been assigned a group/token.', components: [] }).then(setTimeout(() => interaction.deleteReply(), 10000));
+			if (response.success == false) return interaction.reply({ content: `Failed to login to roblox account: \`\`\`${response.error}\`\`\``, components: [] }).then(setTimeout(() => interaction.deleteReply(), 10000));
 			const rank = interaction.options.get('rank').value;
 			let username = interaction.options.get('username').value;
 			const member = userstringtouser(interaction, username);
@@ -46,9 +46,9 @@ module.exports = {
 
 			request(options, async function(error, rbxresponse) {
 				const req = rbxresponse.body;
-				if (!req) return interaction.reply({ content: 'Oops! We are currently have a problem communicating with roblox. <http://status.roblox.com/>', components: [] });
+				if (!req) return interaction.reply({ content: 'Oops! We are currently have a problem communicating with roblox. <http://status.roblox.com/>', components: [] }).then(setTimeout(() => interaction.deleteReply(), 10000));
 				const req2 = JSON.parse(rbxresponse.body);
-				if (req2.success === false) return interaction.reply({ content: 'Failed to find ROBLOX user, did you enter the correct username?', components: [] });
+				if (req2.success === false) return interaction.reply({ content: 'Failed to find ROBLOX user, did you enter the correct username?', components: [] }).then(setTimeout(() => interaction.deleteReply(), 10000));
 				noblox.getRoles(response.group).then((res44) => {
 					let roleid = null;
 					const searching = rank;
@@ -57,7 +57,7 @@ module.exports = {
 							roleid = res44[i].rank;
 						}
 					}
-					if (roleid == null) return interaction.reply({ content: 'Failed to find ROBLOX rank, did you enter the correct rank name?', components: [] });
+					if (roleid == null) return interaction.reply({ content: 'Failed to find ROBLOX rank, did you enter the correct rank name?', components: [] }).then(setTimeout(() => interaction.deleteReply(), 10000));
 					noblox.setRank({ group: response.group, target: Number(req2.Id), rank: Number(roleid) }).then((nobloxres) => {
 						if (nobloxres) {
 							interaction.reply({ content: 'Successfully changed `' + username + '\'s` rank to `' + rank + '`', components: [] });
@@ -66,7 +66,8 @@ module.exports = {
 							throw 'Did not recieve expected response from API.';
 						}
 					}).catch(function(e) {
-						return interaction.reply({ content: `Failed to change \`${username}'s\` rank to \`${rank}\` \`\`\`${e}\`\`\``, components: [] });
+						// eslint-disable-next-line max-nested-callbacks
+						return interaction.reply({ content: `Failed to change \`${username}'s\` rank to \`${rank}\` \`\`\`${e}\`\`\``, components: [] }).then(setTimeout(() => interaction.deleteReply(), 10000));
 					});
 				});
 			});

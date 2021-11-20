@@ -25,8 +25,8 @@ module.exports = {
 	async execute(client, interaction) {
 
 		changeaccount(interaction.guild.id).then((response) => {
-			if (response == null) return interaction.reply({ content: 'Error: This guild has not been assigned a group/token.', components: [] });
-			if (response.success == false) return interaction.reply({ content: `Failed to login to roblox account: \`\`\`${response.error}\`\`\``, components: [] });
+			if (response == null) return interaction.reply({ content: 'Error: This guild has not been assigned a group/token.', components: [] }).then(setTimeout(() => interaction.deleteReply(), 10000));
+			if (response.success == false) return interaction.reply({ content: `Failed to login to roblox account: \`\`\`${response.error}\`\`\``, components: [] }).then(setTimeout(() => interaction.deleteReply(), 10000));
 			let username = interaction.options.get('username').value;
 			const member = userstringtouser(interaction, username);
 			if (member) {username = member.nickname || member.user.username;}
@@ -41,9 +41,9 @@ module.exports = {
 
 			request(options, async function(error, rbxresponse) {
 				const req = rbxresponse.body;
-				if (!req) return interaction.reply({ content: 'Oops! We are currently have a problem communicating with roblox. <http://status.roblox.com/>', components: [] });
+				if (!req) return interaction.reply({ content: 'Oops! We are currently have a problem communicating with roblox. <http://status.roblox.com/>', components: [] }).then(setTimeout(() => interaction.deleteReply(), 10000));
 				const req2 = JSON.parse(rbxresponse.body);
-				if (req2.success === false) return interaction.reply({ content: 'Failed to find ROBLOX user, did you enter the correct username?', components: [] });
+				if (req2.success === false) return interaction.reply({ content: 'Failed to find ROBLOX user, did you enter the correct username?', components: [] }).then(setTimeout(() => interaction.deleteReply(), 10000));
 				noblox.getRankInGroup(response.group, Number(req2.Id)).then((rankid) => {
 					if (rankid) {
 						noblox.getRankNameInGroup(response.group, Number(req2.Id)).then((rankname) => {
@@ -59,7 +59,7 @@ module.exports = {
 						throw 'Did not recieve expected response from API.';
 					}
 				}).catch(function(e) {
-					return interaction.reply({ content: `Failed to find \`${username}'s\` rank. \`\`\`${e}\`\`\``, components: [] });
+					return interaction.reply({ content: `Failed to find \`${username}'s\` rank. \`\`\`${e}\`\`\``, components: [] }).then(setTimeout(() => interaction.deleteReply(), 10000));
 				});
 			});
 		});
