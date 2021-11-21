@@ -10,6 +10,7 @@ function userstringtouser(interaction, string) {
 	return interaction.guild.members.cache.get(string);
 }
 
+
 module.exports = {
 	permissions: {
 		roles: ['Bot Perms'],

@@ -14,14 +14,14 @@ module.exports = {
 					command.execute(client, interaction);
 				}
 				else {
-					interaction.reply({ content: 'You do not have sufficent permissions to execute this command.', ephemeral: true });
+					interaction.reply({ content: 'You do not have sufficent permissions to execute this command.', ephemeral: true }).then(setTimeout(() => interaction.deleteReply(), 10000));
 				}
 			});
 
 		}
 		catch (error) {
 			console.error(error);
-			interaction.reply({ content: 'There was an error while executing this command! ```' + error + '```', ephemeral: true });
+			interaction.reply({ content: 'There was an error while executing this command! ```' + error + '```', ephemeral: true }).then(setTimeout(() => interaction.deleteReply(), 10000));
 		}
 	},
 };
