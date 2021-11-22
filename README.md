@@ -6,7 +6,7 @@ If you plan on using this bot for your own use, you must make a config.json file
 
 ```json
 {
-    "token": "YOURTOEKN",
+    "token": "YOURTOKEN",
     "clientID": "BOTCLIENTID",
     "status": {
         "type": "WATCHING",
