@@ -31,7 +31,7 @@ module.exports = {
 								interaction.reply({ content: `${username}'s rank: \`${rankname}\` \`${rankid}\``, components: [] });
 							}
 							else {
-								throw 'Did not recieve expected response from API.';
+								throw 'Did not recieve expected response from API. Try again later.';
 							}
 						});
 					}
