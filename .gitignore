@@ -105,3 +105,6 @@ dist
 
 # Configuration
 config.json
+
+#Servers
+servers/
