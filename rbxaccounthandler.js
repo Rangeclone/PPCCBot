@@ -1,5 +1,7 @@
 const noblox = require('noblox.js');
 const config = require('./config.json');
+var fs = require("fs");
+const serverfiles = fs.readdirSync("./servers").filter((file) => file.endsWith(".json"));
 const request = require('request-promise');
 let user = ['', 0, {}];
 
@@ -18,16 +20,26 @@ function getUserFromMention(mention, interaction) {
 
 module.exports = {
 	async changeaccount(guildId) {
-		if (config.groups && guildId) {
+		if (guildId) {
 			if (user[0] == String(guildId)) return { success: true, user: user[2], group: user[1] };
-			const selectedgroup = config.groups[String(guildId)];
+			var serverconfig
+			try {
+			serverconfig = fs.readFileSync("servers/" + String(guildId) + ".json");
+			  } catch (error) {
+				return {
+					success: false,
+					error: error,
+				};
+			  }
+			if(!serverconfig) return null
+			const selectedgroup = JSON.parse(serverconfig)
 			if (!selectedgroup) return null;
-			return noblox.setCookie(selectedgroup[1]).then(function(res) {
-				user = [guildId, selectedgroup[0], res];
+			return noblox.setCookie(selectedgroup.Token).then(function(res) {
+				user = [guildId, selectedgroup.GroupID, res];
 				return {
 					success: true,
 					user: res,
-					group: selectedgroup[0],
+					group: selectedgroup.GroupID,
 				};
 			}).catch(function(e) {
 				return {
@@ -78,3 +90,26 @@ module.exports = {
 		}
 	},
 };
+
+/* old backup
+async changeaccount(guildId) {
+		if (config.groups && guildId) {
+			if (user[0] == String(guildId)) return { success: true, user: user[2], group: user[1] };
+			const selectedgroup = config.groups[String(guildId)];
+			if (!selectedgroup) return null;
+			return noblox.setCookie(selectedgroup[1]).then(function(res) {
+				user = [guildId, selectedgroup[0], res];
+				return {
+					success: true,
+					user: res,
+					group: selectedgroup[0],
+				};
+			}).catch(function(e) {
+				return {
+					success: false,
+					error: e,
+				};
+			});
+		}
+	},
+*/
