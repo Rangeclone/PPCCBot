@@ -19,6 +19,37 @@ function getUserFromMention(mention, interaction) {
 }
 
 module.exports = {
+	async getgroupinfo(id) {
+		const options = {
+			url: 'https://groups.roblox.com/v2/groups?groupIds=' + id,
+			method: 'GET',
+			headers: {
+				'Accept': 'text/html',
+				'User-Agent': 'Chrome',
+			},
+		};
+		return request(options).then((response) => {
+			const parsedresponse = JSON.parse(response);
+			if (parsedresponse.data.length < 1) return { success: false, error: 'Roblox Group not found!' };
+			return { success: true, group: parsedresponse.data[0] };
+		})
+			.catch(function(err) {
+				return { success: false, error: 'Roblox API error:' + err };
+			});
+	},
+	async testcookie(cookie) {
+		return noblox.setCookie(cookie).then(function(res) {
+			return {
+				success: true,
+				user: res,
+			};
+		}).catch(function(e) {
+			return {
+				success: false,
+				error: e,
+			};
+		});
+	},
 	async changeaccount(guildId) {
 		if (guildId) {
 			if (user[0] == String(guildId)) return { success: true, user: user[2], group: user[1] };
