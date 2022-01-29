@@ -63,11 +63,11 @@ module.exports = {
 
 			return request(options).then((response) => {
 				const parsedresponse = JSON.parse(response);
-				if (parsedresponse.status === 'error') return { success: false, error: 'Bloxlink API error: ```' + parsedresponse.error + '```' };
+				if (parsedresponse.status === 'error') return { success: false, error: 'Bloxlink API error: ' + parsedresponse.error };
 				return { success: true, user: parsedresponse.primaryAccount };
 			})
 				.catch(function(err) {
-					return { success: false, error: 'Bloxlink API error: ```' + err + '```' };
+					return { success: false, error: 'Bloxlink API error: ' + err };
 				});
 		}
 		if (typeof usern == 'string') {
@@ -81,11 +81,11 @@ module.exports = {
 			};
 			return request(options).then((response) => {
 				const parsedresponse = JSON.parse(response);
-				if (parsedresponse.success == false) return { success: false, error: 'Roblox API error: ```' + parsedresponse.errorMessage + '```' };
+				if (parsedresponse.success == false) return { success: false, error: 'Roblox API error: ' + parsedresponse.errorMessage };
 				return { success: true, user: parsedresponse.Id };
 			})
 				.catch(function(err) {
-					return { success: false, error: 'Roblox API error: ```' + err + '```' };
+					return { success: false, error: 'Roblox API error:' + err };
 				});
 		}
 	},

@@ -22,7 +22,7 @@ module.exports = {
 			const username = interaction.options.get('username').value;
 
 			getrobloxid(username, interaction).then((moduleresponse) => {
-				if (moduleresponse.success === false) return interaction.reply({ content: '**Error** ' + moduleresponse.error, components: [] }).then(setTimeout(() => interaction.deleteReply(), 10000));
+				if (moduleresponse.success === false) return interaction.reply({ content: `Failed to find ${username}'s rank. \`\`\`${moduleresponse.error}\`\`\``, components: [] }).then(setTimeout(() => interaction.deleteReply(), 10000));
 				const id = moduleresponse.user;
 				noblox.getRankInGroup(response.group, Number(id)).then((rankid) => {
 					if (rankid) {
