@@ -8,7 +8,7 @@ const userfiles = fs.readdirSync("./verifiedusers").filter((file) => file.endsWi
 const request = require('request-promise');
 
 let user = ['', 0, {}];
-const verifytext = ['ball','cookie','apple','adventure','bread','oof','car','chicken','golf','and','the','amber','red','green','orange','blue','story','life','time','baby','toys','race','clap','human','sad','angry','happy','lonely','sound','smell','look']
+const verifytext = ['ball','cookie','apple','adventure','bread','oof','car','chicken','golf','and','the','amber','red','green','orange','blue','story','life','time','baby','toys','race','clap','human','sad','angry','happy','lonely','sound','smell','look','dog','cat','rainbow','yellow','purple']
 const buttonexpire = 300000;
 
 function getUserFromMention(mention, interaction) {
