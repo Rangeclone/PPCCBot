@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-
+const { verifyaccount } = require('../rbxaccounthandler.js');
 module.exports = {
 	permissions: {
 		users: [216703533460881409],

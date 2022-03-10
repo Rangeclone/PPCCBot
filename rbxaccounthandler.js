@@ -1,9 +1,15 @@
 const noblox = require('noblox.js');
 const config = require('./config.json');
+const { MessageActionRow, MessageSelectMenu, MessageEmbed, MessageButton } = require('discord.js');
 var fs = require("fs");
+var redirect = module.exports
 const serverfiles = fs.readdirSync("./servers").filter((file) => file.endsWith(".json"));
+const userfiles = fs.readdirSync("./verifiedusers").filter((file) => file.endsWith(".json"));
 const request = require('request-promise');
+
 let user = ['', 0, {}];
+const verifytext = ['ball','cookie','apple','adventure','bread','oof','car','chicken','golf','and','the','amber','red','green','orange','blue','story','life','time','baby','toys','race','clap','human','sad','angry','happy','lonely','sound','smell','look']
+const buttonexpire = 300000;
 
 function getUserFromMention(mention, interaction) {
 	if (!mention) return;
@@ -36,6 +42,103 @@ module.exports = {
 			.catch(function(err) {
 				return { success: false, error: 'Roblox API error:' + err };
 			});
+	},
+	async verifyaccount(id,interaction,username){
+		if(userfiles.find(name => name = String(id)+'.json')) {
+			const buttonrow2 = new MessageActionRow()
+				  .addComponents(
+					  new MessageButton()
+						  .setCustomId('update')
+						  .setLabel('Update Roles/Nickname')
+						  .setStyle('PRIMARY'),
+				  )
+				  .addComponents(
+					  new MessageButton()
+						  .setCustomId('re')
+						  .setLabel('Reverify')
+						  .setStyle('DANGER'),
+				  );
+			//redirect.updateroles(id,interaction,String(id)+'.json')
+			interaction.reply({ content: 'Account already verified, what would you like to do?', components: [buttonrow2] })
+			const filter2 = z => (z.customId === 'update' || z.customId === 're') && z.user.id === interaction.user.id;
+		} else {
+			redirect.changeaccount(interaction.guild.id).then((response) => {
+				if (response == null) return interaction.reply({ content: 'Error: This guild has not been assigned a group/token.', components: [] }).then(setTimeout(() => interaction.deleteReply(), 10000));
+				if (response.success == false) return interaction.reply({ content: `Failed to login to roblox account: \`\`\`${response.error}\`\`\``, components: [] }).then(setTimeout(() => interaction.deleteReply(), 10000));
+				redirect.getrobloxid(username, interaction).then((moduleresponse) => {
+					if (moduleresponse.success === false) return interaction.reply({ content: `Failed to find ROBLOX account \`${username}\` \`\`\`${moduleresponse.error}\`\`\``, components: [] }).then(setTimeout(() => interaction.deleteReply(), 10000));
+
+				var code = ''
+				for (let i = 0; i < 10; i++) {
+					let result = Math.floor((Math.random() * verifytext.length));
+					if(i==9){
+						code = code + verifytext[result]
+					} else {
+						code = code + verifytext[result] + ' '
+					}
+				  }
+				  const buttonrow = new MessageActionRow()
+				  .addComponents(
+					  new MessageButton()
+						  .setCustomId('done')
+						  .setLabel('Done')
+						  .setStyle('PRIMARY'),
+				  )
+				  .addComponents(
+					  new MessageButton()
+						  .setCustomId('cancel')
+						  .setLabel('Cancel')
+						  .setStyle('DANGER'),
+				  );
+				  const returnembed = new MessageEmbed()
+					.setTitle('Account Verification Required For `'+username+'`')
+					.setThumbnail('http://www.roblox.com/Thumbs/Avatar.ashx?x=420&y=420&Format=Png&userId='+String(moduleresponse.user))
+					.setTimestamp()
+					.setDescription('Please enter the following code into your ROBLOX account\'s about me page.')
+					.addField(`**Verification Code**`, `\`${code}\``, false)
+					.setFooter('This prompt will deactivate in ' + Math.floor(buttonexpire / 1000) + ' seconds');
+					interaction.reply({ content: 'Account not found on our database, please complete manual verification.',  embeds: [returnembed] , components: [buttonrow],files: ["https://media.discordapp.net/attachments/936354789950910504/951581216375701514/unknown.png"], });
+
+					const filter = z => (z.customId === 'cancel' || z.customId === 'done') && z.user.id === interaction.user.id;
+					const collector = interaction.channel.createMessageComponentCollector({ filter, time: buttonexpire });
+					var resolved = false
+					collector.on('collect', async z => {
+						if (z.customId === 'cancel') {
+							return z.update({content: 'Verification cancelled', embeds: [], files: [], components: [] }).then(setTimeout(() => interaction.deleteReply(), 10000));
+						}
+						if (z.customId === 'done') {
+								let blurb = await noblox.getBlurb({userId: moduleresponse.user})
+										noblox.getBlurb({userId: moduleresponse.user}).then((desc) => {
+											if (desc) {
+												if(desc === code){
+													z.update({ content: `Code matched`, embeds: [], files: [], components: [] })
+												} else {
+													z.update({ content: `Code didn't match.`, embeds: [], files: [], components: [] })
+												}
+											}
+											else {
+												throw 'Did not recieve expected response from API.';
+											}
+								}).catch(function(e) {
+									return z.update({ content: `Failed to find ${username}'s rank. \`\`\`${e}\`\`\``, files: [], components: []  }).then(setTimeout(() => interaction.deleteReply(), 10000));
+								});
+						}
+						resolved = true
+					});
+					collector.on('end', collected => {
+						if(resolved === false) return interaction.update({content: 'Verification timed out.', embeds: [], files: [], components: [] }).then(setTimeout(() => interaction.deleteReply(), 10000));
+					});
+			});
+		});
+		}
+	},
+	async updateroles(id,interaction,filename){
+
+
+		this.updatenickname(id,interaction)
+	},
+	async updatenickname(id){
+
 	},
 	async testcookie(cookie) {
 		return noblox.setCookie(cookie).then(function(res) {
@@ -121,7 +224,7 @@ module.exports = {
 		}
 	},
 };
-
+redirect = module.exports
 /* old backup
 async changeaccount(guildId) {
 		if (config.groups && guildId) {
