@@ -19,4 +19,4 @@ If you plan on using this bot for your own use, you must make a config.json file
 ```
 https://discord.gg/NwQkzsNTK4
 
-Bot Developer: mod#4165
+Bot Developer: 𝓂𝑜𝒹#6969
